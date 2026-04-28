@@ -1,7 +1,3 @@
-To help you present your project professionally, here is a complete README.md file tailored for your Smart Cradle Baby Monitoring System.
-
-You can copy this text, save it as README.md in your project's root folder, and upload it to your GitHub repository.
-
 Smart Cradle Baby Monitoring System
 A real-time AI-driven monitoring system designed to detect a baby's emotional state and provide live updates to parents via a cloud-based web dashboard.
 
