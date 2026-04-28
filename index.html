@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Baby Monitor Dashboard</title>
+    <style>
+        body { font-family: sans-serif; text-align: center; padding: 50px; }
+        .card { padding: 40px; border-radius: 20px; color: white; display: inline-block; width: 300px; }
+        .normal { background-color: #27ae60; }
+        .sad { background-color: #c0392b; }
+        .abnormal { background-color: #f39c12; }
+    </style>
+</head>
+<body>
+    <h1>👶 Smart Cradle Monitor</h1>
+    <div id="status-card" class="card">
+        <h2 id="status">Loading...</h2>
+        <p>Confidence: <span id="conf">--</span>%</p>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+        // --- PASTE YOUR CONFIG HERE ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyCqZsE4CK50KaIPUA0ClwEfcba9C-C9lSQ",
+  authDomain: "smart-cradle-baby-monitoring.firebaseapp.com",
+  databaseURL: "https://smart-cradle-baby-monitoring-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "smart-cradle-baby-monitoring",
+  storageBucket: "smart-cradle-baby-monitoring.firebasestorage.app",
+  messagingSenderId: "304550138577",
+  appId: "1:304550138577:web:45217057e97ce6cb8c6bf0",
+  measurementId: "G-HMJZN333XD"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+        const statusRef = ref(db, 'baby_status');
+
+        onValue(statusRef, (snapshot) => {
+            const data = snapshot.val();
+            if (data) {
+                const statusDiv = document.getElementById("status");
+                const card = document.getElementById("status-card");
+                
+                statusDiv.innerText = data.state.toUpperCase();
+                document.getElementById("conf").innerText = (data.confidence * 100).toFixed(1);
+                
+                // Update color
+                card.className = "card " + data.state;
+            }
+        });
+    </script>
+</body>
+</html>
