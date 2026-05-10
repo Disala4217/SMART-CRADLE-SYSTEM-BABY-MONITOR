@@ -55,10 +55,9 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-
 // 🔥 Firebase config
 const firebaseConfig = {
-    apiKey: "AIzaSyCqZsE4CK50KaIPUA0ClwEfcba9C-C9lSQ",
+    apiKey: "YOUR_API_KEY",
     authDomain: "smart-cradle-baby-monitoring.firebaseapp.com",
     databaseURL: "https://smart-cradle-baby-monitoring-default-rtdb.asia-southeast1.firebasedatabase.app",
     projectId: "smart-cradle-baby-monitoring",
@@ -71,36 +70,32 @@ const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 const statusRef = ref(db, 'baby_status');
 
-
-// 🧠 track last update
+// 🧠 last update tracker
 let lastUpdateTime = Date.now();
 
-
-// 🔊 sound setup
+// 🔊 sound
 const alertSound = new Audio("song.mp3");
 
 function playAlertSound() {
     alertSound.currentTime = 0;
-    alertSound.play().catch(e => {});
+    alertSound.play().catch(()=>{});
 }
 
-
-// 🔔 notification setup
+// 🔔 notifications
 if ("Notification" in window) {
     Notification.requestPermission();
 }
 
-function sendNotification(message) {
+function sendNotification(msg) {
     if (Notification.permission === "granted") {
         new Notification("👶 Smart Cradle Alert", {
-            body: message,
+            body: msg,
             icon: "https://cdn-icons-png.flaticon.com/512/4645/4645949.png"
         });
     }
 }
 
-
-// 🔥 unlock audio (browser requirement)
+// 🔥 unlock audio (required by browser)
 document.body.addEventListener("click", () => {
     alertSound.play().then(() => {
         alertSound.pause();
@@ -108,7 +103,9 @@ document.body.addEventListener("click", () => {
 }, { once: true });
 
 
-// 🔥 Firebase listener
+// ==========================
+// 🔥 FIREBASE LISTENER
+// ==========================
 onValue(statusRef, (snapshot) => {
     const data = snapshot.val();
 
@@ -120,11 +117,11 @@ onValue(statusRef, (snapshot) => {
 
         let state = data.state;
 
-        // 🚨 ALERT LOGIC
+        // 🔥 DISPLAY LOGIC
         if (state === "sad") {
             statusDiv.innerText = "😢 BABY IS SAD";
             playAlertSound();
-            sendNotification("Baby is crying / sad detected!");
+            sendNotification("Baby is crying!");
         }
 
         else if (state === "abnormal") {
@@ -136,7 +133,7 @@ onValue(statusRef, (snapshot) => {
         else if (state === "no_baby") {
             statusDiv.innerText = "🚨 NO BABY DETECTED";
             playAlertSound();
-            sendNotification("Baby is missing from crib!");
+            sendNotification("Baby is missing!");
         }
 
         else {
@@ -151,11 +148,13 @@ onValue(statusRef, (snapshot) => {
 });
 
 
-// ⚠ OFFLINE CHECK (2 minutes)
+// ==========================
+// ⚠ OFFLINE DETECTION
+// ==========================
 setInterval(() => {
     const now = Date.now();
 
-    if (now - lastUpdateTime > 120000) {
+    if (now - lastUpdateTime > 120000) { // 2 minutes
 
         const statusDiv = document.getElementById("status");
         const card = document.getElementById("status-card");
